@@ -7,61 +7,86 @@ import 'package:materialbasic/model/products_repository.dart';
 import 'package:materialbasic/supplemental/asymmetric_view.dart';
 
 class HomePage extends StatelessWidget {
+  final Category category;
+
+  const HomePage({this.category: Category.all});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        brightness: Brightness.light,
-        title: Text('SHRINE'),
-        leading: IconButton(
-          icon: Icon(
-            Icons.menu,
-            semanticLabel: 'menu',
-          ),
-          onPressed: () {
-            print('Menu button');
-          },
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.search,
-              semanticLabel: 'search',
-            ),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.tune,
-              semanticLabel: 'filter',
-            ),
-            onPressed: () {},
-          )
-        ],
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: ProductRepository.loadProducts(Category.all),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          }
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return Center(child: CircularProgressIndicator());
-            case ConnectionState.none:
-              return AsymmetricView(products: []);
-            case ConnectionState.active:
-            case ConnectionState.done:
-              return AsymmetricView(
-                  products: snapshot.data.documents
-                      .map((e) => Product.fromSnapshot(e))
-                      .toList());
-          }
-          return null;
-        },
-      ),
-      resizeToAvoidBottomInset:
-          false, //the keyboard's appearance does not alter the size of the home page or its widgets
+//    return Scaffold(
+//      appBar: AppBar(
+//        brightness: Brightness.light,
+//        title: Text('SHRINE'),
+//        leading: IconButton(
+//          icon: Icon(
+//            Icons.menu,
+//            semanticLabel: 'menu',
+//          ),
+//          onPressed: () {
+//            print('Menu button');
+//          },
+//        ),
+//        actions: <Widget>[
+//          IconButton(
+//            icon: Icon(
+//              Icons.search,
+//              semanticLabel: 'search',
+//            ),
+//            onPressed: () {},
+//          ),
+//          IconButton(
+//            icon: Icon(
+//              Icons.tune,
+//              semanticLabel: 'filter',
+//            ),
+//            onPressed: () {},
+//          )
+//        ],
+//      ),
+//      body: StreamBuilder<QuerySnapshot>(
+//        stream: ProductRepository.loadProducts(Category.all),
+//        builder: (context, snapshot) {
+//          if (snapshot.hasError) {
+//            return Text('Error: ${snapshot.error}');
+//          }
+//          switch (snapshot.connectionState) {
+//            case ConnectionState.waiting:
+//              return Center(child: CircularProgressIndicator());
+//            case ConnectionState.none:
+//              return AsymmetricView(products: []);
+//            case ConnectionState.active:
+//            case ConnectionState.done:
+//              return AsymmetricView(
+//                  products: snapshot.data.documents
+//                      .map((e) => Product.fromSnapshot(e))
+//                      .toList());
+//          }
+//          return null;
+//        },
+//      ),
+//      resizeToAvoidBottomInset:
+//          false, //the keyboard's appearance does not alter the size of the home page or its widgets
+//    );
+    return StreamBuilder<QuerySnapshot>(
+      stream: ProductRepository.loadProducts(category),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return Center(child: CircularProgressIndicator());
+          case ConnectionState.none:
+            return AsymmetricView(products: []);
+          case ConnectionState.active:
+          case ConnectionState.done:
+            return AsymmetricView(
+                products: snapshot.data.documents
+                    .map((e) => Product.fromSnapshot(e))
+                    .toList());
+        }
+        return null;
+      },
     );
   }
 
