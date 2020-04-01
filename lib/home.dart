@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:materialbasic/model/product.dart';
 import 'package:materialbasic/model/products_repository.dart';
+import 'package:materialbasic/supplemental/asymmetric_view.dart';
 
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        brightness: Brightness.light,
         title: Text('SHRINE'),
         leading: IconButton(
           icon: Icon(
@@ -43,14 +45,17 @@ class HomePage extends StatelessWidget {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           }
-          switch(snapshot.connectionState) {
+          switch (snapshot.connectionState) {
             case ConnectionState.waiting:
-            return CircularProgressIndicator();
+              return Center(child: CircularProgressIndicator());
             case ConnectionState.none:
-              return _buildGridView(context, []);
+              return AsymmetricView(products: []);
             case ConnectionState.active:
             case ConnectionState.done:
-            return _buildGridView(context, snapshot.data.documents);
+              return AsymmetricView(
+                  products: snapshot.data.documents
+                      .map((e) => Product.fromSnapshot(e))
+                      .toList());
           }
           return null;
         },
@@ -78,44 +83,50 @@ class HomePage extends StatelessWidget {
     final NumberFormat formatter = NumberFormat.simpleCurrency(
         locale: Localizations.localeOf(context).toString());
 
-    return products.map((e) => Product.fromSnapshot(e)).map((product) => Card(
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              AspectRatio(
-                aspectRatio: 18.0 / 11.0,
-                child: Image.asset(
-                  product.assetName,
-                  fit: BoxFit.fitWidth,
-                  package: product.assetPackage,
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        product.name,
-                        style: theme.textTheme.headline6,
-                        maxLines: 1,
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Text(
-                        formatter.format(product.price),
-                        style: theme.textTheme.bodyText1,
-                      )
-                    ],
+    return products
+        .map((e) => Product.fromSnapshot(e))
+        .map((product) => Card(
+              elevation: 0.0,
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  AspectRatio(
+                    aspectRatio: 18.0 / 11.0,
+                    child: Image.asset(
+                      product.assetName,
+                      fit: BoxFit.fitWidth,
+                      package: product.assetPackage,
+                    ),
                   ),
-                ),
-              )
-            ],
-          ),
-        ))
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            product.name,
+                            style: theme.textTheme.button,
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          SizedBox(
+                            height: 4,
+                          ),
+                          Text(
+                            formatter.format(product.price),
+                            style: theme.textTheme.caption,
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ))
         .toList();
   }
 }

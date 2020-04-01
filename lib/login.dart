@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'colors.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -29,38 +30,42 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
             SizedBox(height: 120,),
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.account_circle),
-                filled: true,
-                labelText: 'Username',
+            AccentColorOverride(
+              color: kShrineBrown900,
+              child: TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.account_circle),
+                  labelText: 'Username',
+                ),
               ),
             ),
             SizedBox(height: 12,),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.lock_outline),
-                filled: true,
-                labelText: 'Password',
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    // Based on passwordVisible state choose the icon
-                    passwordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: Theme.of(context).primaryColorDark,
+            AccentColorOverride(
+              color: kShrineBrown900,
+              child: TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.lock_outline),
+                  labelText: 'Password',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      // Based on passwordVisible state choose the icon
+                      passwordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Theme.of(context).primaryColorDark,
+                    ),
+                    onPressed: () {
+                      // Update the state i.e. toggle the state of passwordVisible variable
+                      setState(() {
+                        passwordVisible = !passwordVisible;
+                      });
+                    },
                   ),
-                  onPressed: () {
-                    // Update the state i.e. toggle the state of passwordVisible variable
-                    setState(() {
-                      passwordVisible = !passwordVisible;
-                    });
-                  },
                 ),
+                obscureText: passwordVisible,
               ),
-              obscureText: passwordVisible,
             ),
             ButtonBar(
               children: <Widget>[
@@ -70,18 +75,44 @@ class _LoginPageState extends State<LoginPage> {
                     _usernameController.clear();
                     _passwordController.clear();
                   },
+                  shape: BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(7))
+                  ),
                 ),
                 RaisedButton(
+                  elevation: 8,
                   child: Text('NEXT'),
                   onPressed: () {
                     Navigator.pop(context);
                   },
+                  shape: BeveledRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(7))
+                  ),
                 )
               ],
             )
           ],
         ),
       ),
+    );
+  }
+}
+
+class AccentColorOverride extends StatelessWidget {
+  const AccentColorOverride({
+    Key key, this.color, this.child
+}) : super(key: key);
+  final Color color;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      child: child,
+      data: Theme.of(context).copyWith(
+        accentColor: color,
+        brightness: Brightness.dark
+      )
     );
   }
 }
